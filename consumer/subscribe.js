@@ -1,8 +1,10 @@
 const axios = require("axios");
+const base_url =
+  "http://my-json-server.typicode.com/reinhardjs/dot-indo-backend-test";
 
 module.exports = function (rabbit, post, comment) {
   rabbit.subscribe("get-posts", (payload, ack) => {
-    axios.get("https://my-json-server.typicode.com/typicode/demo/posts").then((response) => {
+    axios.get(base_url + "/posts").then((response) => {
       post
         .bulkCreate(response.data, {
           fields: ["id", "userId", "title", "body"],
@@ -20,11 +22,9 @@ module.exports = function (rabbit, post, comment) {
   rabbit.subscribe("get-posts-detail", (payload, ack) => {
     var data = JSON.parse(payload.content.toString());
 
-    axios
-      .get("https://my-json-server.typicode.com/typicode/demo/posts/" + data.id)
-      .then((response) => {
-        console.log(response.data);
-      });
+    axios.get(base_url + "/posts/" + data.id).then((response) => {
+      console.log(response.data);
+    });
 
     ack();
   });
@@ -33,7 +33,7 @@ module.exports = function (rabbit, post, comment) {
     var data = JSON.parse(payload.content.toString());
 
     axios
-      .post("https://my-json-server.typicode.com/typicode/demo/posts", data, {
+      .post(base_url + "/posts", data, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -50,7 +50,7 @@ module.exports = function (rabbit, post, comment) {
     var data = JSON.parse(payload.content.toString());
 
     axios
-      .put("https://my-json-server.typicode.com/typicode/demo/posts/" + data.id, data, {
+      .put(base_url + "/posts/" + data.id, data, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -71,15 +71,13 @@ module.exports = function (rabbit, post, comment) {
   rabbit.subscribe("delete-posts", (payload, ack) => {
     var data = JSON.parse(payload.content.toString());
 
-    axios
-      .delete("https://my-json-server.typicode.com/typicode/demo/posts/" + data.id)
-      .then(() => {
-        post.findOne({ where: { id: data.id } }).then((dataBeingDeleted) => {
-          post.destroy({ where: { id: data.id } }).then((affectedRows) => {
-            console.log(dataBeingDeleted.dataValues);
-            ack();
-          });
+    axios.delete(base_url + "/posts/" + data.id).then(() => {
+      post.findOne({ where: { id: data.id } }).then((dataBeingDeleted) => {
+        post.destroy({ where: { id: data.id } }).then((affectedRows) => {
+          console.log(dataBeingDeleted.dataValues);
+          ack();
         });
       });
+    });
   });
 };
