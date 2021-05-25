@@ -9,6 +9,8 @@ module.exports = function (app) {
     .put(controller.update_post)
     .delete(controller.delete_post);
 
+  app.route("/posts/:postId/comments").get(controller.get_posts_comments);
+
   app.use(function (req, res) {
     res.status(404).send({ url: req.originalUrl + " not founddddd" });
   });

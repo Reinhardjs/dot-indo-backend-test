@@ -12,7 +12,25 @@ module.exports = function (rabbit, post, comment) {
         })
         .then(() => {
           post.findAll().then((posts) => {
-            console.log("Payload : \n", JSON.stringify(posts));
+            console.log("POSTS : \n", JSON.stringify(posts));
+            ack();
+          });
+        });
+    });
+  });
+
+  rabbit.subscribe("get-posts-comments", (payload, ack) => {
+    var data = JSON.parse(payload.content.toString());
+
+    axios.get(base_url + "/posts/" + data.id + "/comments").then((response) => {
+      comment
+        .bulkCreate(response.data, {
+          fields: ["id", "postId", "userId", "name", "email", "body"],
+          updateOnDuplicate: ["id", "postId"],
+        })
+        .then(() => {
+          comment.findAll().then((comments) => {
+            console.log("COMMENTS : \n", JSON.stringify(comments));
             ack();
           });
         });
@@ -24,9 +42,8 @@ module.exports = function (rabbit, post, comment) {
 
     axios.get(base_url + "/posts/" + data.id).then((response) => {
       console.log(response.data);
+      ack();
     });
-
-    ack();
   });
 
   rabbit.subscribe("post-posts", (payload, ack) => {

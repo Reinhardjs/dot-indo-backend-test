@@ -9,6 +9,21 @@ exports.get_posts = function (req, res) {
   });
 };
 
+exports.get_posts_comments = function (req, res) {
+  var rabbitMQ = new MessageBroker();
+  var payload = {
+    id: req.params.postId,
+  };
+
+  rabbitMQ
+    .send("get-posts-comments", Buffer.from(JSON.stringify(payload)))
+    .then(() => {
+      res.json({
+        response: "success",
+      });
+    });
+};
+
 exports.create_post = function (req, res) {
   var body = req.body;
   var rabbitMQ = new MessageBroker();
