@@ -2,7 +2,7 @@ const axios = require("axios");
 
 module.exports = function (rabbit, post, comment) {
   rabbit.subscribe("get-posts", (payload, ack) => {
-    axios.get("https://jsonplaceholder.typicode.com/posts").then((response) => {
+    axios.get("https://my-json-server.typicode.com/typicode/demo/posts").then((response) => {
       post
         .bulkCreate(response.data, {
           fields: ["id", "userId", "title", "body"],
@@ -21,7 +21,7 @@ module.exports = function (rabbit, post, comment) {
     var data = JSON.parse(payload.content.toString());
 
     axios
-      .get("https://jsonplaceholder.typicode.com/posts/" + data.id)
+      .get("https://my-json-server.typicode.com/typicode/demo/posts/" + data.id)
       .then((response) => {
         console.log(response.data);
       });
@@ -33,7 +33,7 @@ module.exports = function (rabbit, post, comment) {
     var data = JSON.parse(payload.content.toString());
 
     axios
-      .post("https://jsonplaceholder.typicode.com/posts", data, {
+      .post("https://my-json-server.typicode.com/typicode/demo/posts", data, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -50,7 +50,7 @@ module.exports = function (rabbit, post, comment) {
     var data = JSON.parse(payload.content.toString());
 
     axios
-      .put("https://jsonplaceholder.typicode.com/posts/" + data.id, data, {
+      .put("https://my-json-server.typicode.com/typicode/demo/posts/" + data.id, data, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -72,7 +72,7 @@ module.exports = function (rabbit, post, comment) {
     var data = JSON.parse(payload.content.toString());
 
     axios
-      .delete("https://jsonplaceholder.typicode.com/posts/" + data.id)
+      .delete("https://my-json-server.typicode.com/typicode/demo/posts/" + data.id)
       .then(() => {
         post.findOne({ where: { id: data.id } }).then((dataBeingDeleted) => {
           post.destroy({ where: { id: data.id } }).then((affectedRows) => {
